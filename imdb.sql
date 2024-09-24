@@ -282,33 +282,44 @@ VALUES
     (9, 9, '2008-09-09', '2008-09-30'),
     (10, 10, '1972-10-10', '1972-10-31'),
     (11, 11, '1974-11-11', '1974-11-30');
-    
-CREATE VIEW film_summary_view AS
+
+CREATE VIEW `film_studio_details` AS
 SELECT
-    f.id_film,
-    f.nume AS nume_film,
-    s.nume AS nume_studio,
-    f.data_lansare,
-    (
-        SELECT MAX(p.nume)
-        FROM participare_in_film pif
-        JOIN persoane p ON pif.persoana_id = p.id_persoana
-        WHERE pif.film_id = f.id_film AND pif.meserie = 'regizor'
-    ) AS nume_regizor,
-    (
-        SELECT GROUP_CONCAT(g.tip ORDER BY g.tip ASC)
-        FROM filme_genuri fg
-        JOIN genuri g ON fg.gen_id = g.id_gen
-        WHERE fg.film_id = f.id_film
-    ) AS genuri_film,
-    (
-        SELECT c.nume
-        FROM filme_cinematografe fc
-        JOIN cinematografe c ON fc.cinematograf_id = c.id_cinematograf
-        WHERE fc.film_id = f.id_film
-        LIMIT 1
-    ) AS nume_cinematograf
+    f.`id_film`,
+    f.`nume` AS `nume_film`,
+    f.`data_lansare`,
+    s.`id_studio`,
+    s.`nume` AS `nume_studio`
 FROM
-    filme f
+    `filme` f
+JOIN `studiouri` s ON f.`studio` = s.`id_studio`;
+
+CREATE VIEW `film_summary_view` AS
+SELECT
+    f.`id_film`,
+    f.`nume` AS `nume_film`,
+    s.`nume` AS `nume_studio`,
+    f.`data_lansare`,
+    (
+        SELECT MAX(p.`nume`)
+        FROM `participare_in_film` pif
+        JOIN `persoane` p ON pif.`persoana_id` = p.`id_persoana`
+        WHERE pif.`film_id` = f.`id_film` AND `pif.meserie` = 'regizor'
+    ) AS `nume_regizor`,
+    (
+        SELECT GROUP_CONCAT(g.`tip` ORDER BY g.`tip` ASC)
+        FROM `filme_genuri` fg
+        JOIN `genuri` g ON fg.`gen_id` = g.`id_gen`
+        WHERE fg.`film_id` = f.`id_film`
+    ) AS `genuri_film`,
+    (
+        SELECT c.`nume`
+        FROM `filme_cinematografe` fc
+        JOIN `cinematografe` c ON fc.`cinematograf_id` = c.`id_cinematograf`
+        WHERE fc.`film_id` = f.`id_film`
+        LIMIT 1
+    ) AS `nume_cinematograf`
+FROM
+    `filme` f
 JOIN
-    studiouri s ON f.studio = s.id_studio;
+    `studiouri` s ON f.`studio` = s.`id_studio`;
